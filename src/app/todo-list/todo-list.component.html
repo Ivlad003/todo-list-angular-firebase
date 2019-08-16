@@ -1,0 +1,43 @@
+<div class="container">
+  <div class="row">
+    <div class="col form-control">
+      <label>
+        Task text:
+        <input type="text" [formControl]="taskFC" />
+      </label>
+      <p>
+        <button (click)="createTask()">Create task</button>
+      </p>
+    </div>
+    <div
+      class="col"
+      cdkDropList
+      [cdkDropListData]="unCheckedTasks"
+      #todoList="cdkDropList"
+      [cdkDropListConnectedTo]="[doneList]"
+      [cdkDropListData]="unCheckedTasks"
+      (cdkDropListDropped)="drop($event)"
+      #list
+    >
+      <app-todo-item
+        *ngFor="let task of unCheckedTasks"
+        cdkDrag
+        [task]="task"
+      ></app-todo-item>
+    </div>
+    <div
+      class="col"
+      cdkDropList
+      #doneList="cdkDropList"
+      [cdkDropListConnectedTo]="[todoList]"
+      [cdkDropListData]="checkedTasks"
+      (cdkDropListDropped)="drop($event)"
+    >
+      <app-todo-item
+        *ngFor="let task of checkedTasks"
+        cdkDrag
+        [task]="task"
+      ></app-todo-item>
+    </div>
+  </div>
+</div>

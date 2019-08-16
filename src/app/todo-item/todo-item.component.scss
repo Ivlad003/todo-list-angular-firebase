@@ -1,0 +1,11 @@
+input[disabled]{
+  font: inherit;
+  padding: inherit;
+  margin-left: -2px;
+  margin-right: -2px;
+}
+input:not([disabled]) {
+  border-color: transparent;
+  color: inherit;
+  background: inherit;
+}
