@@ -1,4 +1,3 @@
-import { Task } from './../services/todo-list-service/Task';
 import {
   Component,
   OnInit,
@@ -7,8 +6,9 @@ import {
   ViewChild
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { TodoListServiceService } from '../services/todo-list-service/todo-list-service.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Task } from '../models';
+import { TodoListService } from '../services/todo-list-service/todo-list-service';
 
 @Component({
   selector: 'app-todo-item',
@@ -28,7 +28,7 @@ export class TodoItemComponent implements OnInit {
   isEdite = false;
 
 
-  constructor(private todoListServiceService: TodoListServiceService, private _snackBar: MatSnackBar) {}
+  constructor(private todoListServiceService: TodoListService, private snackBar: MatSnackBar) {}
 
   ngOnInit() {
     this.oldValue = this.task.text;
@@ -39,7 +39,6 @@ export class TodoItemComponent implements OnInit {
   }
 
   edite() {
-    this.input.nativeElement.removeAttribute("disabled");
     this.isEdite = true;
     this.input.nativeElement.focus();
   }
@@ -47,17 +46,17 @@ export class TodoItemComponent implements OnInit {
   save() {
     this.task.text = this.myForm.controls['text'].value;
 
+    this.disableInput();
+
     if (!this.task.text) {
-      this._snackBar.open('Not epmty input', 'Undo', {
+      this.snackBar.open('Not epmty input', 'Undo', {
         duration: 3000
       });
-      this.disableInput();
       this.myForm.controls['text'].setValue(this.oldValue);
       return;
     }
 
     this.todoListServiceService.updateOne(this.task);
-    this.disableInput();
   }
 
   delete() {
@@ -70,7 +69,6 @@ export class TodoItemComponent implements OnInit {
 
   disableInput() {
     this.isEdite = false;
-    this.input.nativeElement.setAttribute("disabled", "");
     this.input.nativeElement.blur();
   }
 

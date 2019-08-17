@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TodoListServiceService } from './todo-list-service.service';
+import { TodoListServiceService } from './todo-list-service';
 
 describe('TodoListServiceService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

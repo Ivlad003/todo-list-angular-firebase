@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { Subject } from 'rxjs';
-import { Task } from './Task';
+import { Task } from 'src/app/models';
+import { BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TodoListServiceService {
+export class TodoListService {
   private basePath = 'todo_list';
-  subjectRemove = new Subject<Task>();
-  subjectChecked = new Subject<Task>();
+  subjectRemove = new BehaviorSubject<Task>(new Task(''));
+  subjectChecked = new BehaviorSubject<Task>(new Task(''));
 
   constructor(private db: AngularFireDatabase) {}
 
@@ -21,18 +22,22 @@ export class TodoListServiceService {
   create(value) {
     this.db.database.ref(`${this.basePath}/${value.id}`).set(value);
   }
-  updateOne(value){
+  updateOne(value) {
     this.db.database.ref(`${this.basePath}/${value.id}`).update(value);
   }
 
   observerData() {
-    return new Promise((res, rej) => {
-      const obj = this.db.database.ref(this.basePath);
-      obj.on('value', (dataSnapshot) => {
-        res(dataSnapshot.val());
-        obj.off();
-      });
+    const source = Observable.create(observer => {
+      const ref = this.db.database.ref(this.basePath);
+      const callbackFn = ref.on(
+        'value',
+        dataSnapshot => observer.next(dataSnapshot.val()),
+        error => observer.error(error)
+      );
+      return () => ref.off('value', callbackFn);
     });
+
+    return source;
   }
 
   remove(value) {
