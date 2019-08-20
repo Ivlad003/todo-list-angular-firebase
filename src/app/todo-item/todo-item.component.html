@@ -21,40 +21,39 @@
           (change)="onCheckChange($event)"
         />
       </div>
-      <div class="form-group">
-        <button
-          type="button"
-          class="form-control btn btn-warning"
-          (click)="edite()"
-          *ngIf="!isEdite"
-        >
-          Edite
-        </button>
-        <ng-template [ngIf]="isEdite">
-          <button
-            type="button"
-            class="btn form-control btn-outline-primary"
-            (click)="done()"
-          >
-            Done
-          </button>
+      <div
+        *ngIf="isEdite; then thenBlock; else elseBlock"
+        class="form-group"
+      ></div>
 
-          <button
-            type="button"
-            class="btn form-control btn-success"
-            (click)="save()"
-          >
-            Save
-          </button>
-          <button
-            type="button"
-            class="btn form-control btn-danger"
-            (click)="delete()"
-          >
-            Delete
-          </button>
-        </ng-template>
-      </div>
+      <div class="form-group"></div>
     </form>
   </div>
 </div>
+
+<ng-template #thenBlock>
+  <button
+    type="button"
+    class="btn form-control btn-outline-primary"
+    (click)="done()"
+  >
+    Done
+  </button>
+
+  <button type="button" class="btn form-control btn-success" (click)="save()">
+    Save
+  </button>
+  <button type="button" class="btn form-control btn-danger" (click)="delete()">
+    Delete
+  </button></ng-template
+>
+<ng-template #elseBlock
+  ><button
+    type="button"
+    class="form-control btn btn-warning"
+    (click)="edite()"
+    *ngIf="!isEdite"
+  >
+    Edite
+  </button></ng-template
+>

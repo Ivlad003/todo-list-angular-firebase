@@ -64,10 +64,9 @@ export class TodoListComponent implements OnInit, AfterContentInit {
   }
 
   filterLists() {
+    this.tasks.sort((a, b) => (a.index > b.index ? 1 : -1));
     this.checkedTasks = this.chackedList();
-    this.checkedTasks.sort((a, b) => (a.index > b.index ? 1 : -1));
     this.unCheckedTasks = this.unChackedList();
-    this.unCheckedTasks.sort((a, b) => (a.index > b.index ? 1 : -1));
   }
 
   createTask() {
