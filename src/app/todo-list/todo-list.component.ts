@@ -17,35 +17,28 @@ import { NgZone } from '@angular/core';
   styleUrls: ['./todo-list.component.scss']
 })
 export class TodoListComponent implements OnInit, AfterContentInit {
-  taskFC;
+  taskFC: FormControl;
   tasks: Task[] = [];
-
   checkedTasks: Task[] = [];
   unCheckedTasks: Task[] = [];
+
   constructor(
     private zone: NgZone,
     private todoListServiceService: TodoListService,
     private snackBar: MatSnackBar
   ) {}
 
-  ngAfterContentInit(): void {
-    const subscription = this.todoListServiceService.observerData();
-    subscription.subscribe(obj => {
+  public ngAfterContentInit(): void {
+    const observable = this.todoListServiceService.observerData();
+    const subscribe = observable.subscribe(obj => {
       this.zone.run(() => {
         this.parseObject(obj);
       });
-      subscription.unsubscribe();
+      subscribe.unsubscribe();
     });
   }
 
-  parseObject(obj) {
-    Object.keys(obj).forEach(filedName => {
-      this.tasks.push(obj[filedName] as Task);
-    });
-    this.filterLists();
-  }
-
-  ngOnInit() {
+  public ngOnInit(): void {
     this.taskFC = new FormControl('');
 
     this.todoListServiceService.subjectRemove.subscribe(obj => {
@@ -63,37 +56,7 @@ export class TodoListComponent implements OnInit, AfterContentInit {
     });
   }
 
-  filterLists() {
-    this.tasks.sort((a, b) => (a.index > b.index ? 1 : -1));
-    this.checkedTasks = this.chackedList();
-    this.unCheckedTasks = this.unChackedList();
-  }
-
-  createTask() {
-    const task = new Task(this.taskFC.value);
-
-    if (!task.text) {
-      this.snackBar.open('Not epmty input', 'Undo', {
-        duration: 3000
-      });
-      return;
-    }
-
-    task.index = this.unCheckedTasks.length;
-    this.tasks.push(task);
-    this.todoListServiceService.create(task);
-    this.filterLists();
-    this.taskFC.setValue();
-  }
-
-  chackedList() {
-    return this.tasks.filter(el => el.isDone);
-  }
-  unChackedList() {
-    return this.tasks.filter(el => !el.isDone);
-  }
-
-  drop(event: CdkDragDrop<string[]>) {
+  public drop(event: CdkDragDrop<string[]>): void {
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,
@@ -116,21 +79,58 @@ export class TodoListComponent implements OnInit, AfterContentInit {
     this.updateListInStorage(this.checkedTasks);
   }
 
-  listUnCheckedTasksUpdateIndex() {
+  public createTask(): void {
+    const task = new Task(this.taskFC.value);
+
+    if (!task.text) {
+      this.snackBar.open('Not epmty input', 'Undo', {
+        duration: 3000
+      });
+      return;
+    }
+
+    task.index = this.unCheckedTasks.length;
+    this.tasks.push(task);
+    this.todoListServiceService.create(task);
+    this.filterLists();
+    this.taskFC.setValue('');
+  }
+
+  private parseObject(obj): void {
+    Object.keys(obj).forEach(filedName => {
+      this.tasks.push(obj[filedName] as Task);
+    });
+    this.filterLists();
+  }
+
+  private filterLists(): void {
+    this.tasks.sort((a, b) => (a.index > b.index ? 1 : -1));
+    this.checkedTasks = this.chackedList();
+    this.unCheckedTasks = this.unChackedList();
+  }
+
+  private chackedList(): Task[] {
+    return this.tasks.filter(el => el.isDone);
+  }
+  private unChackedList(): Task[] {
+    return this.tasks.filter(el => !el.isDone);
+  }
+
+  private listUnCheckedTasksUpdateIndex(): void {
     this.unCheckedTasks.forEach((elm, index) => {
       elm.index = index;
       elm.isDone = false;
     });
   }
 
-  listCheckedTasksUpdateIndex() {
+  private listCheckedTasksUpdateIndex(): void {
     this.checkedTasks.forEach((elm, index) => {
       elm.index = index;
       elm.isDone = true;
     });
   }
 
-  updateListInStorage(list) {
+  private updateListInStorage(list: Task[]): void {
     list.forEach(el => {
       this.todoListServiceService.updateOne(el);
     });

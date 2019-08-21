@@ -8,25 +8,25 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class TodoListService {
-  private basePath = 'todo_list';
+  private basePath: string = 'todo_list';
   subjectRemove = new BehaviorSubject<Task>(new Task(''));
   subjectChecked = new BehaviorSubject<Task>(new Task(''));
 
   constructor(private db: AngularFireDatabase) {}
 
-  updateList(list) {
+  public updateList(list: Task[]): void {
     const obj = this.db.database.ref(this.basePath);
     obj.set(list);
   }
 
-  create(value) {
+  public create(value: Task): void {
     this.db.database.ref(`${this.basePath}/${value.id}`).set(value);
   }
-  updateOne(value) {
+  public updateOne(value: Task): void {
     this.db.database.ref(`${this.basePath}/${value.id}`).update(value);
   }
 
-  observerData() {
+  public observerData(): Observable<any> {
     const source = Observable.create(observer => {
       const ref = this.db.database.ref(this.basePath);
       const callbackFn = ref.on(
@@ -40,7 +40,7 @@ export class TodoListService {
     return source;
   }
 
-  remove(value) {
+  public remove(value: Task): void {
     this.db.database.ref(`${this.basePath}/${value.id}`).remove();
     this.subjectRemove.next(value);
   }
